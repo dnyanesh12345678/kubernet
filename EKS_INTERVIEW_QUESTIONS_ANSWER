@@ -1,0 +1,253 @@
+Skip to content
+Chat history
+
+You said:
+AWS EKS kubernet related frequently asked interview questions & answers for DevOps engineer.
+ChatGPT said:
+Here’s a complete list of frequently asked AWS EKS (Elastic Kubernetes Service) & Kubernetes interview questions and answers — specifically tailored for DevOps engineers, covering real-world and AWS-integrated scenarios 👇
+
+🧠 Basic EKS & Kubernetes Interview Questions
+1. What is Amazon EKS?
+Answer:
+Amazon EKS (Elastic Kubernetes Service) is a managed Kubernetes service provided by AWS that simplifies running Kubernetes clusters.
+AWS manages the control plane (API server, etcd, scheduler, controller manager), while you manage worker nodes.
+
+Example:
+In production, you might deploy microservices on EKS, where AWS handles cluster management and scaling.
+
+2. Difference between EKS and self-managed Kubernetes?
+Feature	Self-managed K8s	Amazon EKS
+Control Plane	Managed by you	Managed by AWS
+Upgrades	Manual	Automated or one-click
+HA & Security	Manual setup	In-built
+Cost	EC2 & infra	Pay for worker nodes + control plane fee
+AWS Integration	Manual	Native IAM, CloudWatch, ALB, etc.
+3. How does EKS work internally?
+Answer:
+
+EKS manages control plane across multiple AWS AZs for high availability.
+
+Worker nodes (EC2 or Fargate) register with the cluster.
+
+EKS uses IAM roles, VPC networking, and load balancers for secure access and communication.
+
+kubectl or AWS CLI is used for cluster management.
+
+4. What components does AWS manage in EKS?
+Kubernetes API server
+
+etcd (cluster state)
+
+Scheduler and controllers
+
+Control plane security and scaling
+
+You manage only:
+
+Worker nodes (EC2 or Fargate)
+
+Node groups, Pods, and Services.
+
+5. How do you connect to an EKS cluster?
+Answer:
+
+Configure aws eks update-kubeconfig --region <region> --name <cluster-name>
+
+Use kubectl get nodes to verify.
+👉 It updates your local kubeconfig with AWS IAM authentication.
+
+⚙️ EKS Cluster Setup & Management
+6. How do you create an EKS cluster?
+You can create EKS using:
+
+AWS Management Console
+
+AWS CLI
+
+eksctl (recommended for simplicity)
+
+Terraform (in production CI/CD pipelines)
+
+Example with eksctl:
+
+eksctl create cluster --name dev-cluster --region ap-south-1 --node-type t3.medium --nodes 3
+7. What is a Node Group in EKS?
+Answer:
+A Node Group is a set of EC2 instances (worker nodes) that run your workloads.
+AWS manages lifecycle operations such as provisioning, upgrades, and scaling of these nodes.
+
+Example:
+You can create a managed node group for frontend microservices and another for backend.
+
+8. How to monitor EKS clusters?
+Answer:
+Use CloudWatch, Prometheus, and Grafana.
+
+CloudWatch: for control plane metrics and logs.
+
+Prometheus: for pod-level metrics.
+
+Grafana: visualization.
+
+AWS Managed Prometheus & Managed Grafana also available.
+
+9. How is networking handled in EKS?
+Answer:
+EKS uses Amazon VPC CNI plugin:
+
+Each Pod gets an IP address from the VPC subnet.
+
+Security Groups and NACLs control traffic.
+
+Supports advanced networking (ENI, prefix delegation).
+
+10. What are security best practices for EKS?
+Use IAM roles for service accounts (IRSA)
+
+Use Private Endpoint for API access
+
+Enable encryption with KMS for secrets
+
+Use network policies for Pod-to-Pod communication
+
+Regularly update node AMIs
+
+☸️ Kubernetes Concepts (Important for EKS)
+11. What is the difference between Deployment, ReplicaSet, and StatefulSet?
+Resource	Used For	Example
+Deployment	Stateless apps	Nginx, API servers
+StatefulSet	Stateful apps	MySQL, Kafka
+ReplicaSet	Ensures pod count	Managed by Deployment
+12. How does EKS handle storage?
+Answer:
+EKS integrates with EBS (Elastic Block Storage) and EFS (Elastic File System) using StorageClass and PersistentVolumeClaims (PVCs).
+
+Example:
+
+storageClassName: gp2
+EBS used for single-AZ;
+EFS for multi-AZ shared storage.
+
+13. How do you expose services in EKS?
+ClusterIP: internal access only.
+
+NodePort: accessible via node IP + port.
+
+LoadBalancer: creates an AWS ELB or ALB automatically.
+
+Example:
+
+type: LoadBalancer
+→ creates an AWS Load Balancer for external traffic.
+
+14. How do you handle secrets in EKS?
+Use Kubernetes Secrets objects (base64 encoded).
+
+Integrate with AWS Secrets Manager or AWS Parameter Store.
+
+Encrypt with KMS for higher security.
+
+15. How do you upgrade an EKS cluster?
+Answer:
+
+Upgrade the EKS control plane via console or CLI.
+
+Update node groups (launch template or AMI).
+
+Update Kubernetes manifests (apiVersion fields).
+
+Test in dev environment first.
+
+🧩 DevOps-Specific EKS Questions
+16. How do you integrate CI/CD with EKS?
+Answer:
+
+CodePipeline + CodeBuild for build & deploy.
+
+Or Jenkins/GitHub Actions with kubectl or Helm.
+
+Example: After build, push Docker image → ECR → deploy to EKS via Helm chart.
+
+17. How do you deploy apps in EKS?
+Answer:
+
+Write a Deployment YAML file.
+
+Apply it with kubectl apply -f.
+
+Optionally use Helm charts or Kustomize for versioned deployments.
+
+18. What is IAM Role for Service Account (IRSA)?
+Answer:
+It allows a Kubernetes service account to assume an IAM role, so Pods can securely access AWS resources (like S3, SQS) without storing credentials inside containers.
+
+19. How to autoscale workloads in EKS?
+Answer:
+
+Cluster Autoscaler: adjusts EC2 node count.
+
+Horizontal Pod Autoscaler (HPA): scales Pods based on CPU/memory.
+
+Vertical Pod Autoscaler: adjusts Pod resource requests automatically.
+
+20. What is Fargate in EKS?
+Answer:
+EKS Fargate runs Pods without managing EC2 nodes.
+Serverless — AWS handles provisioning, scaling, patching.
+Good for small workloads or dev/test environments.
+
+🧱 Advanced / Real-Time Scenario Questions
+21. How do you troubleshoot failing Pods in EKS?
+Answer:
+
+kubectl get pods – check pod status
+
+kubectl describe pod <name> – events/logs
+
+kubectl logs <pod> – check container logs
+
+Check CloudWatch logs for detailed errors.
+
+22. How do you restrict access to an EKS cluster?
+Answer:
+
+Use IAM authentication for kubectl.
+
+Map IAM users to Kubernetes RBAC roles in aws-auth ConfigMap.
+
+Use AWS Private Endpoint for API access only within VPC.
+
+23. Can EKS span multiple regions?
+Answer:
+No — an EKS cluster is region-specific.
+But you can create multiple clusters in different regions and use Route 53 / CloudFront for global routing.
+
+24. How do you ensure high availability in EKS?
+Answer:
+
+Control plane automatically deployed across 3 AZs.
+
+Deploy worker nodes across multiple subnets/AZs.
+
+Use EFS for multi-AZ storage.
+
+25. What tools are commonly used with EKS in production?
+Helm – packaging/deployment
+
+Terraform – infrastructure provisioning
+
+Prometheus & Grafana – monitoring
+
+Fluent Bit / CloudWatch Logs – logging
+
+Istio / Linkerd – service mesh
+
+ArgoCD – GitOps deployments
+
+Would you like me to prepare a set of 30 most common EKS + Kubernetes interview questions with short answers in PDF format (perfect for quick revision before interviews)?
+
+
+
+No file chosenNo file chosen
+ChatGPT can make mistakes. Check important info. See Cookie Preferences.
+
