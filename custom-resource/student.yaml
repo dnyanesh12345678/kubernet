@@ -1,0 +1,7 @@
+apiVersion: demo.com/v1
+kind: Student
+metadata:
+  name: john
+spec:
+  name: John
+
