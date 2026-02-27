@@ -1,0 +1,291 @@
+additionalLabels: {}
+affinity: {}
+alternateConfig: {}
+annotations: {}
+autoscaling:
+  additionalMetrics: []
+  behavior: {}
+  enabled: false
+  maxReplicas: 10
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 80
+clusterRole:
+  annotations: {}
+  clusterRoleBinding:
+    annotations: {}
+    name: ""
+  create: false
+  name: ""
+  rules: []
+command:
+  extraArgs: []
+  name: ""
+config:
+  exporters:
+    debug: {}
+    loki:
+      endpoint: http://loki.observability.svc.cluster.local:3100/loki/api/v1/push
+      tls:
+        insecure: true
+    otlp/tempo:
+      endpoint: tempo.observability.svc.cluster.local:4317
+      tls:
+        insecure: true
+    prometheus:
+      endpoint: 0.0.0.0:8889
+  extensions:
+    health_check:
+      endpoint: 0.0.0.0:13133
+  processors:
+    batch:
+      send_batch_size: 1024
+      timeout: 5s
+    memory_limiter:
+      check_interval: 1s
+      limit_mib: 800
+      limit_percentage: 80
+      spike_limit_mib: 200
+      spike_limit_percentage: 25
+  receivers:
+    jaeger:
+      protocols:
+        grpc:
+          endpoint: ${env:MY_POD_IP}:14250
+        thrift_compact:
+          endpoint: ${env:MY_POD_IP}:6831
+        thrift_http:
+          endpoint: ${env:MY_POD_IP}:14268
+    otlp:
+      protocols:
+        grpc:
+          endpoint: 0.0.0.0:4317
+        http:
+          endpoint: 0.0.0.0:4318
+    prometheus:
+      config:
+        scrape_configs:
+        - job_name: opentelemetry-collector
+          scrape_interval: 10s
+          static_configs:
+          - targets:
+            - ${env:MY_POD_IP}:8888
+    zipkin:
+      endpoint: ${env:MY_POD_IP}:9411
+  service:
+    extensions:
+    - health_check
+    pipelines:
+      logs:
+        exporters:
+        - loki
+        processors:
+        - memory_limiter
+        - batch
+        receivers:
+        - otlp
+      metrics:
+        exporters:
+        - prometheus
+        processors:
+        - memory_limiter
+        - batch
+        receivers:
+        - otlp
+      traces:
+        exporters:
+        - otlp/tempo
+        processors:
+        - memory_limiter
+        - batch
+        receivers:
+        - otlp
+    telemetry:
+      metrics:
+        readers: []
+configMap:
+  create: true
+  existingName: ""
+dnsConfig: {}
+dnsPolicy: ""
+enableConfigChecksumAnnotation: true
+extraContainers: []
+extraEnvs: []
+extraEnvsFrom: []
+extraManifests: []
+extraVolumeMounts: []
+extraVolumes: []
+fullnameOverride: ""
+hostAliases: []
+hostNetwork: false
+hostPID: false
+image:
+  digest: ""
+  pullPolicy: IfNotPresent
+  repository: otel/opentelemetry-collector-contrib
+  tag: 0.102.1
+imagePullSecrets: []
+ingress:
+  additionalIngresses: []
+  enabled: false
+initContainers: []
+internalTelemetryViaOTLP:
+  endpoint: ""
+  headers: []
+  logs:
+    enabled: false
+    endpoint: ""
+    headers: []
+  metrics:
+    enabled: false
+    endpoint: ""
+    headers: []
+  traces:
+    enabled: false
+    endpoint: ""
+    headers: []
+lifecycleHooks: {}
+livenessProbe:
+  httpGet:
+    path: /
+    port: 13133
+mode: deployment
+nameOverride: ""
+namespaceOverride: ""
+networkPolicy:
+  allowIngressFrom: []
+  annotations: {}
+  egressRules: []
+  enabled: false
+  extraIngressRules: []
+nodeSelector: {}
+podAnnotations: {}
+podDisruptionBudget:
+  enabled: false
+podLabels: {}
+podMonitor:
+  enabled: false
+  extraLabels: {}
+  metricsEndpoints:
+  - port: metrics
+podSecurityContext: {}
+ports:
+  jaeger-compact:
+    containerPort: 6831
+    enabled: true
+    hostPort: 6831
+    protocol: UDP
+    servicePort: 6831
+  jaeger-grpc:
+    containerPort: 14250
+    enabled: true
+    hostPort: 14250
+    protocol: TCP
+    servicePort: 14250
+  jaeger-thrift:
+    containerPort: 14268
+    enabled: true
+    hostPort: 14268
+    protocol: TCP
+    servicePort: 14268
+  metrics:
+    containerPort: 8889
+    enabled: true
+    protocol: TCP
+    servicePort: 8889
+  otlp:
+    appProtocol: grpc
+    containerPort: 4317
+    enabled: true
+    hostPort: 4317
+    protocol: TCP
+    servicePort: 4317
+  otlp-http:
+    containerPort: 4318
+    enabled: true
+    hostPort: 4318
+    protocol: TCP
+    servicePort: 4318
+  zipkin:
+    containerPort: 9411
+    enabled: true
+    hostPort: 9411
+    protocol: TCP
+    servicePort: 9411
+presets:
+  annotationDiscovery:
+    logs:
+      enabled: false
+    metrics:
+      enabled: false
+  clusterMetrics:
+    enabled: false
+  hostMetrics:
+    enabled: false
+  kubeletMetrics:
+    enabled: false
+  kubernetesAttributes:
+    enabled: false
+    extractAllPodAnnotations: false
+    extractAllPodLabels: false
+  kubernetesEvents:
+    enabled: false
+  logsCollection:
+    enabled: false
+    includeCollectorLogs: false
+    maxRecombineLogSize: 102400
+    storeCheckpoints: false
+priorityClassName: ""
+prometheusRule:
+  defaultRules:
+    additionalRuleAnnotations: {}
+    additionalRuleLabels: {}
+    enabled: false
+  enabled: false
+  extraLabels: {}
+  groups: []
+readinessProbe:
+  httpGet:
+    path: /
+    port: 13133
+replicaCount: 2
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 200m
+    memory: 512Mi
+revisionHistoryLimit: 10
+rollout:
+  rollingUpdate: {}
+  strategy: RollingUpdate
+runtimeClassName: ""
+schedulerName: ""
+securityContext: {}
+service:
+  annotations: {}
+  type: ClusterIP
+serviceAccount:
+  annotations: {}
+  automountServiceAccountToken: true
+  create: true
+  name: ""
+serviceMonitor:
+  enabled: false
+  extraLabels: {}
+  metricRelabelings: []
+  metricsEndpoints:
+  - port: metrics
+  relabelings: []
+shareProcessNamespace: false
+startupProbe: {}
+statefulset:
+  persistentVolumeClaimRetentionPolicy:
+    enabled: false
+    whenDeleted: Retain
+    whenScaled: Retain
+  podManagementPolicy: Parallel
+  volumeClaimTemplates: []
+tolerations: []
+topologySpreadConstraints: []
+useGOMEMLIMIT: true

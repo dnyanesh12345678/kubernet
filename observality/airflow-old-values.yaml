@@ -1,0 +1,33 @@
+airflow:
+  config:
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__WEBSERVER__EXPOSE_CONFIG: "true"
+  extraPipPackages:
+  - apache-airflow-providers-cncf-kubernetes
+  image:
+    repository: apache/airflow
+    tag: 2.8.1
+dags:
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClassName: standard
+executor: KubernetesExecutor
+logs:
+  persistence:
+    enabled: true
+    size: 1Gi
+    storageClassName: standard
+postgresql:
+  auth:
+    database: airflow
+    password: airflow
+    username: airflow
+  enabled: true
+  image:
+    registry: docker.io
+    repository: bitnami/postgresql
+    tag: latest
+webserver:
+  service:
+    type: NodePort

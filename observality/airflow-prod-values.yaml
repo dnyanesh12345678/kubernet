@@ -1,0 +1,112 @@
+# -------------------------
+# Executor
+# -------------------------
+executor: CeleryExecutor
+
+# -------------------------
+# Airflow Image
+# -------------------------
+images:
+  airflow:
+    repository: apache/airflow
+    tag: 2.9.3
+    pullPolicy: Always
+
+# -------------------------
+# Disable Separate API Server
+# -------------------------
+apiServer:
+  enabled: false
+
+# -------------------------
+# Core Configuration
+# -------------------------
+config:
+  core:
+    load_examples: false
+  webserver:
+    expose_config: false
+  metrics:
+    statsd_on: false
+    prometheus_enabled: true
+    prometheus_port: 9102
+
+# -------------------------
+# Metadata DB Connection
+# -------------------------
+data:
+  metadataConnection:
+    user: airflow
+    pass: airflow
+    protocol: postgresql
+    host: airflow-postgresql
+    port: 5432
+    db: airflow
+
+# -------------------------
+# Migration Job
+# -------------------------
+migrateDatabaseJob:
+  enabled: true
+
+# -------------------------
+# DAG Persistence
+# -------------------------
+dags:
+  persistence:
+    enabled: true
+    size: 2Gi
+    storageClassName: standard
+
+# -------------------------
+# Logs Persistence
+# -------------------------
+logs:
+  persistence:
+    enabled: true
+    size: 2Gi
+    storageClassName: standard
+
+# -------------------------
+# Internal PostgreSQL
+# -------------------------
+postgresql:
+  enabled: true
+
+  image:
+    registry: docker.io
+    repository: bitnami/postgresql
+    tag: latest
+
+  auth:
+    username: airflow
+    password: airflow
+    database: airflow
+
+  primary:
+    persistence:
+      enabled: true
+      size: 2Gi
+      storageClassName: standard
+
+# -------------------------
+# Redis (Celery Broker)
+# -------------------------
+redis:
+  enabled: true
+
+# -------------------------
+# Webserver Service
+# -------------------------
+webserver:
+  service:
+    type: NodePort
+
+# -------------------------
+# Scheduler & Workers
+# -------------------------
+scheduler:
+  replicas: 1
+
+workers:
+  replicas: 2
